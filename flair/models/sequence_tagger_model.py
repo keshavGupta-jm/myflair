@@ -207,7 +207,7 @@ class SequenceTagger(flair.nn.Model):
                     # TODO: Decide how to initialize the hidden state variables
                     # self.hs_initializer(self.lstm_init_h)
                     # self.hs_initializer(self.lstm_init_c)
-
+                self.rnn.flatten_parameters()
             # final linear map to tag space
             self.linear = torch.nn.Linear(
                 hidden_size * num_directions, len(tag_dictionary)
@@ -658,6 +658,7 @@ class SequenceTagger(flair.nn.Model):
             )
 
             # if initial hidden state is trainable, use this state
+            self.rnn.flatten_parameters()
             if self.train_initial_hidden_state:
                 initial_hidden_state = [
                     self.lstm_init_h.unsqueeze(1).repeat(1, len(sentences), 1),
@@ -670,7 +671,7 @@ class SequenceTagger(flair.nn.Model):
             sentence_tensor, output_lengths = torch.nn.utils.rnn.pad_packed_sequence(
                 rnn_output, batch_first=True
             )
-
+            self.rnn.flatten_parameters()
             if self.use_dropout > 0.0:
                 sentence_tensor = self.dropout(sentence_tensor)
             # word dropout only before LSTM - TODO: more experimentation needed
